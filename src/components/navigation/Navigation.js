@@ -3,6 +3,7 @@ import React from "react"
 import { SignInButton } from "./SignInButton";
 import { Link, useLocation } from "react-router-dom";
 import { UserDropdown } from "./desktop/UserDropdown";
+import logo from "../../../public/logo.svg"
 
 const Header = styled.div`
     position: absolute;
@@ -70,7 +71,9 @@ function Navigation(props) {
 
     return (
         <Header>
-            <Logo className="fw-bold" to={"/"}>WeData</Logo>
+            <Logo className="fw-bold" to={"/"}>
+                <img src={logo} alt="..."/>
+            </Logo>
             <ButtonGroup className="d-flex flex-row align-items-center">
                 {listBtn.map((btn) => {
                     return (

@@ -5,9 +5,11 @@ import "react-bootstrap-typeahead/css/Typeahead.css";
 import "react-bootstrap-typeahead/css/Typeahead.bs5.css";
 import "bootstrap/dist/js/bootstrap.bundle";
 import "./App.scss";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { providers } from "near-api-js";
-import DataStore from "./pages/DataStoragePage"
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+import StoragePage from "./pages/DataStoragePage"
 import DiscoverPage from "./pages/DiscoverPage";
 import Marketplace from "./pages/MarketPlace"
 import { setupWalletSelector } from "@near-wallet-selector/core";
@@ -22,19 +24,18 @@ import {
   useAccount,
   useInitNear,
   useNear,
-  Widget
 } from "near-social-vm";
 import Navigation from "./components/navigation/Navigation";
 import { NetworkId, Widgets } from "./data/widgets";
-import { supabase } from "./utils/supabase";
 import { utils } from 'near-api-js';
+import DetailPage from "./pages/DetailPage";
+import Root from "./pages/Root";
 
 function App(props) {
   const [connected, setConnected] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [signedAccountId, setSignedAccountId] = useState(null);
   const [walletModal, setWalletModal] = useState(null);
-  const [dataKey, setDataKey] = useState(null);
 
   const { initNear } = useInitNear();
   const near = useNear();
@@ -111,25 +112,53 @@ function App(props) {
   }, [near, accountId]);
 
   useEffect(() => {
-    if (!near) {
+    if (!near || !accountId) {
       return;
     }
 
     const primaryKey = utils.key_pair.KeyPairEd25519.fromRandom();
     const secondKey = utils.key_pair.KeyPairEd25519.fromRandom();
+    const data = JSON.parse(localStorage.getItem("keys"))
 
-    setDataKey({
-      accountId: accountId,
-      primaryKey: {
-        public: primaryKey.getPublicKey().toString(),
-        private: primaryKey.secretKey
-      },
-      secondKey: {
-        public: secondKey.getPublicKey().toString(),
-        private: secondKey.secretKey
-      }
+    if(!data) {
+      localStorage.setItem("keys", JSON.stringify([
+        {
+          accountID: accountId,
+          primaryKey: {
+            public: primaryKey.getPublicKey().toString(),
+            private: primaryKey.secretKey
+          },
+          secondKey: {
+            public: secondKey.getPublicKey().toString(),
+            private: secondKey.secretKey
+          }
+        }
+      ]))
+      return
+    }
+
+    const keys = data.filter(data => {
+      return data.accountID === accountId
     })
-  }, [near])
+
+    if(keys.length === 0){
+      localStorage.setItem("keys", JSON.stringify([
+        ...data,
+        {
+          accountID: accountId,
+          primaryKey: {
+            public: primaryKey.getPublicKey().toString(),
+            private: primaryKey.secretKey
+          },
+          secondKey: {
+            public: secondKey.getPublicKey().toString(),
+            private: secondKey.secretKey
+          }
+        }
+      ]))
+    }
+
+  }, [near, accountId])
 
   const passProps = {
     refreshAllowance: () => refreshAllowance(),
@@ -141,25 +170,34 @@ function App(props) {
     widgets: Widgets,
   };
 
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Root {...passProps} />,
+      children: [
+        {
+          path: "detailPage/*",
+          element: <DetailPage {...passProps} />,
+        },
+        {
+          path: "marketplace",
+          element: <Marketplace {...passProps} />,
+        },
+        {
+          path: "dataStorage",
+          element: <StoragePage {...passProps}/>,
+        },
+        {
+          path: "",
+          element: <DiscoverPage {...passProps} />,
+        },
+      ]
+    },
+  ]);
+
   return (
     <div className="App">
-        <Widget props={dataKey} src={"tvh050423.testnet/widget/SaveKey"}/>
-        <Router basename={process.env.PUBLIC_URL}>
-          <Switch>
-            <Route path={"/dataStorage"}>
-              <Navigation {...passProps} />
-              <DataStore {...passProps} />
-            </Route>
-            <Route path={"/marketplace"}>
-              <Navigation {...passProps} />
-              <Marketplace {...passProps} />
-            </Route>
-            <Route path={"/*"}>
-              <Navigation {...passProps} />
-              <DiscoverPage {...passProps} />
-            </Route>
-          </Switch>
-        </Router>
+      <RouterProvider router={router} />
     </div>
   );
 }
