@@ -12,6 +12,7 @@ import {
 import StoragePage from "./pages/DataStoragePage"
 import DiscoverPage from "./pages/DiscoverPage";
 import Marketplace from "./pages/MarketPlace"
+import ListAcceptPage from "./pages/ListAcceptPage";
 import { setupWalletSelector } from "@near-wallet-selector/core";
 import { setupNearWallet } from "@near-wallet-selector/near-wallet";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
@@ -186,6 +187,10 @@ function App(props) {
         {
           path: "dataStorage",
           element: <StoragePage {...passProps}/>,
+        },
+        {
+          path: "listAccept",
+          element: <ListAcceptPage {...passProps}/>,
         },
         {
           path: "",

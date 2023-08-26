@@ -1,9 +1,11 @@
 import styled from "styled-components";
-import React from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { SignInButton } from "./SignInButton";
 import { Link, useLocation } from "react-router-dom";
 import { UserDropdown } from "./desktop/UserDropdown";
 import logo from "../../../public/logo.svg"
+import { callMethod, viewMethod } from "../../utils/method";
+import { Widget, useAccount, useNear } from "near-social-vm";
 
 const Header = styled.div`
     position: absolute;
@@ -63,14 +65,41 @@ const listBtn = [
     numberID: 2,
     href: "/marketplace"
   },
+  {
+    name: "List Accept",
+    numberID: 3,
+    href: "/listAccept"
+  },
 ];
+
+const contractID = process.env.REACT_APP_CONTRACT_ID
 
 function Navigation(props) {
 
     const location = useLocation()
+    const near = useNear()
+    const account = useAccount();
+    const [isActive, setIsActive] = useState(false)
+
+    useEffect(() => {
+        viewMethod(near, {contractId: contractID, method: "get_balance_of", args: {account_id: account.accountId}}).then((result) => {
+            if(result != -1){
+                setIsActive(true)
+            }else{
+                setIsActive(false)
+            }
+        })
+    }, [near, props])
+
+    const register = useCallback(() => {
+        callMethod(near, {contractId: contractID, method: "register", args: {account_id: account.accountId}}).then(() => {})
+    }, [near, props])
 
     return (
         <Header>
+            {
+                !isActive && <Widget props={{register}} src="tvh050423.testnet/widget/ModalRegister"/>
+            }
             <Logo className="fw-bold" to={"/"}>
                 <img src={logo} alt="..."/>
             </Logo>
@@ -91,7 +120,9 @@ function Navigation(props) {
                     <SignInButton onSignIn={() => props.requestSignIn()} />
                 )}
                 {props.signedIn && (
-                    <UserDropdown {...props} />
+                    <>
+                        {isActive ? (<UserDropdown {...props} />) : (<></>)}
+                    </>
                 )}
             </ButtonGroup>
         </Header>

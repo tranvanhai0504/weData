@@ -16,12 +16,17 @@ export default function DetailPage(props){
 
     const [queryParameters] = useSearchParams()
     const [inforFile, setInforFile] = useState()
-    const [dataFile, setDataFile] = useState(null)
+    const [dataFile, setDataFile] = useState([])
+    const [downloadURL, setDownloadURL] = useState("")
     const supabase = createClient(URL, KEY)
     const near = useNear()
     const account = useAccount();
     const id = queryParameters.get("id").replaceAll(" ", "+")
     const action = queryParameters.get("action")
+    const isActive = queryParameters.get("isActive")
+    const type = queryParameters.get("type")
+
+    console.log(downloadURL)
 
     //get information of file
     const getInfor = useCallback(async () => {
@@ -38,6 +43,10 @@ export default function DetailPage(props){
         const {data} = await supabase.from("description").select("description").eq("id", id).single()
 
         information.description = data.description
+
+        //check that data is mine?
+        const isMine = information.list_access.includes(account.accountId) || information.owner === account.accountId
+        information.isMine = isMine
         
         return information
     }, [near, account])
@@ -70,15 +79,31 @@ export default function DetailPage(props){
 
     //get data of file
     useEffect(() => {
-        if(!inforFile || !inforFile.title){
+        if(!inforFile || !inforFile.title || action === "maketPlace"){
             return
         }
-        console.log("call get files")
 
         //get keys from local storage
         const key = JSON.parse(localStorage.getItem("keys")).filter(key => {
             return key.accountID === account.accountId
         })[0]
+
+        if(type == "buy"){
+            console.log("helo")
+            viewMethod(near, {contractId: contractID, method: "get_data_value", args: {encrypted_cid: id, user_id: account.accountId}}).then((result) => {
+
+                const cid = open(result.key_cid, key.primaryKey.public, key.secondKey.private, nonce)
+                const url = `https://${cid}.ipfs.w3s.link/${inforFile.title}.jsonl`
+
+                axios.get(url, {
+                    responseType: 'stream'
+                })
+                .then(response => {
+                    const dataObject = convertJSON(response.data)
+                    setDataFile(dataObject)
+                })
+            })
+        }
 
         const cid = open(id, key.primaryKey.public, key.secondKey.private, nonce)
         const url = `https://${cid}.ipfs.w3s.link/${inforFile.title}.jsonl`
@@ -91,14 +116,50 @@ export default function DetailPage(props){
             setDataFile(dataObject)
         })
 
+        getLinkDownload(cid, inforFile.title)
     }, [inforFile])
+
+    //buy data func
+    const purchaseData = useCallback(async (id, price) => {
+        if(!near){
+          return
+        }
+    
+        const key = JSON.parse(localStorage.getItem("keys")).filter(key => key.accountID === account.accountId)[0]
+        const pub_key = key.primaryKey.public
+    
+        const args = {
+          encrypted_cid: id,
+          pub_key: pub_key
+        }
+    
+        const subPrice = "000000000000000000000000"
+    
+        const response = await callMethod(near, {contractId: contractID,
+          method: "purchase", args, deposit: price + subPrice})
+      }, [near, props])
+
+    //get link download
+    const getLinkDownload = (cid, title) => {
+        fetch(`https://${cid}.ipfs.w3s.link/${title}.jsonl`, {
+        method: 'GET',
+        })
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            setDownloadURL(url)
+        });
+    }
 
     const passingProps = {
         ...props,
         inforFile,
         action,
         updateState,
-        dataFile
+        dataFile,
+        isActive,
+        purchaseData,
+        downloadURL
     }
 
     return <Widget src="tvh050423.testnet/widget/DetailPage" props={passingProps}/>

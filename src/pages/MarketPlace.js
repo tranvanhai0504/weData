@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Widget, useNear, useAccount } from "near-social-vm";
 import { callMethod, viewMethod } from "../utils/method";
+import { useNavigate } from "react-router-dom";
 
 const contractID = process.env.REACT_APP_CONTRACT_ID
 
@@ -10,6 +11,9 @@ export default function DiscoverPage(props) {
   const account = useAccount();
   const [data, setData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const navigate = useNavigate();
+
+  console.log(data)
 
   const getFiles = useCallback(async () => {
     let uploads = []
@@ -19,7 +23,7 @@ export default function DiscoverPage(props) {
     }
 
     uploads = await viewMethod(near, {contractId: contractID,
-    method: "get_published_data"})
+    method: "get_published_data", args: {user: account.accountId}})
     
     return uploads
   }, [near, account])
@@ -36,21 +40,22 @@ export default function DiscoverPage(props) {
     reloadData()
   }, [near, props])
 
-  const purchaseData = useCallback(async (id) => {
+  const purchaseData = useCallback(async (id, price) => {
     if(!near){
       return
     }
 
     const key = JSON.parse(localStorage.getItem("keys")).filter(key => key.accountID === account.accountId)[0]
-    const access_key = key.primaryKey.public
+    const pub_key = key.primaryKey.public
 
     const args = {
       encrypted_cid: id,
-      access_key: access_key
+      pub_key: pub_key,
+      contract_id: "tdtu_contract_ft.testnet"
     }
 
     const response = await callMethod(near, {contractId: contractID,
-      method: "purchase", args })
+      method: "purchase", args})
   }, [near, props])
 
   const propsPassing = {
@@ -59,7 +64,8 @@ export default function DiscoverPage(props) {
     reloadData,
     isLoading,
     purchaseData,
-    accountId: account.accountId
+    accountId: account.accountId,
+    navigate
   }
 
   return (

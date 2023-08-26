@@ -14,7 +14,7 @@ export default function StoragePage(props) {
   const client = new Web3Storage({ token: process.env.REACT_APP_WEB3STORAGE_TOKEN });
   const near = useNear()
   const account = useAccount();
-  const [listFile, setListFile] = useState([])
+  const [listFile, setListFile] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate();
   const supabase = createClient(URL, KEY)
@@ -31,7 +31,10 @@ export default function StoragePage(props) {
 
     let boughtData = await viewMethod(near, {contractId: contractID, method: "get_accessed_data_by_user", args: {user_id: account.accountId}})
     
-    return [...list, ...boughtData]
+    return {
+      storageData: list,
+      purchaseData: boughtData
+    }
   }, [near, account])
 
   const uploadFile = useCallback(async (file, description, tags) => {
