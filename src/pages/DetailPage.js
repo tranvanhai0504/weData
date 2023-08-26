@@ -119,7 +119,7 @@ export default function DetailPage(props){
     }, [inforFile])
 
     //buy data func
-    const purchaseData = useCallback(async (id, price) => {
+    const purchaseData = useCallback(async (id, price = 0) => {
         if(!near){
           return
         }
@@ -129,13 +129,12 @@ export default function DetailPage(props){
     
         const args = {
           encrypted_cid: id,
-          pub_key: pub_key
+          pub_key: pub_key,
+          contract_id: "harvardtp_ft.testnet"
         }
     
-        const subPrice = "000000000000000000000000"
-    
         const response = await callMethod(near, {contractId: contractID,
-          method: "purchase", args, deposit: price + subPrice})
+          method: "purchase", args})
       }, [near, props])
 
     //get link download

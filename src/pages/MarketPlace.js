@@ -13,8 +13,6 @@ export default function DiscoverPage(props) {
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate();
 
-  console.log(data)
-
   const getFiles = useCallback(async () => {
     let uploads = []
 
@@ -25,7 +23,7 @@ export default function DiscoverPage(props) {
     uploads = await viewMethod(near, {contractId: contractID,
     method: "get_published_data", args: {user: account.accountId}})
     
-    return uploads
+    return uploads.reverse()
   }, [near, account])
 
   const reloadData = useCallback(() => {

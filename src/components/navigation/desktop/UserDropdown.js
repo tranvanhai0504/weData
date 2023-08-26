@@ -123,13 +123,6 @@ export function UserDropdown(props) {
           style={{ minWidth: "fit-content" }}
         >
           <li>
-            <NavLink
-              className="dropdown-item"
-              type="button"
-              to={`/${props.widgets.profilePage}?accountId=${account.accountId}`}
-            >
-              My Profile
-            </NavLink>
           </li>
           <li>
             <button
