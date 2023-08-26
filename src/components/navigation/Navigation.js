@@ -79,10 +79,15 @@ function Navigation(props) {
     const location = useLocation()
     const near = useNear()
     const account = useAccount();
-    const [isActive, setIsActive] = useState(false)
+    const [isActive, setIsActive] = useState(true)
 
     useEffect(() => {
+
+        if(!near) return
+        console.log(account.accountId)
+
         viewMethod(near, {contractId: contractID, method: "get_balance_of", args: {account_id: account.accountId}}).then((result) => {
+            console.log(result)
             if(result != -1){
                 setIsActive(true)
             }else{
@@ -121,7 +126,7 @@ function Navigation(props) {
                 )}
                 {props.signedIn && (
                     <>
-                        {isActive ? (<UserDropdown {...props} />) : (<></>)}
+                        <UserDropdown {...props} />
                     </>
                 )}
             </ButtonGroup>

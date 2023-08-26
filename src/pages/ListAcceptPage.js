@@ -61,7 +61,7 @@ export default function ListAcceptPage(props){
             encrypted_cid: ECID,
             is_access: is_access,
             access_key: secret,
-            contract_id: "tdtu_contract_ft.testnet",
+            contract_id: "harvardtp_ft.testnet",
             pub_key: key.primaryKey.public
         }
 

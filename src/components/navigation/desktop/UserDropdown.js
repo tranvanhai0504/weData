@@ -90,12 +90,6 @@ export function UserDropdown(props) {
   const near = useNear();
   const account = useAccount();
 
-  const withdrawStorage = useCallback(async () => {
-    await near.contract.storage_withdraw({}, undefined, "1");
-  }, [near]);
-
-  const [showPretendModal, setShowPretendModal] = React.useState(false);
-
   return (
     <>
       <StyledDropdown className="dropdown">

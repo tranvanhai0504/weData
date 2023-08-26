@@ -26,8 +26,6 @@ export default function DetailPage(props){
     const isActive = queryParameters.get("isActive")
     const type = queryParameters.get("type")
 
-    console.log(downloadURL)
-
     //get information of file
     const getInfor = useCallback(async () => {
         let information = {}
@@ -89,10 +87,9 @@ export default function DetailPage(props){
         })[0]
 
         if(type == "buy"){
-            console.log("helo")
             viewMethod(near, {contractId: contractID, method: "get_data_value", args: {encrypted_cid: id, user_id: account.accountId}}).then((result) => {
 
-                const cid = open(result.key_cid, key.primaryKey.public, key.secondKey.private, nonce)
+                const cid = open(result.key_cid, result.pub_key, key.primaryKey.private, nonce)
                 const url = `https://${cid}.ipfs.w3s.link/${inforFile.title}.jsonl`
 
                 axios.get(url, {
@@ -102,6 +99,8 @@ export default function DetailPage(props){
                     const dataObject = convertJSON(response.data)
                     setDataFile(dataObject)
                 })
+
+                getLinkDownload(cid, inforFile.title)
             })
         }
 

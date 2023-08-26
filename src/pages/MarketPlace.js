@@ -51,7 +51,7 @@ export default function DiscoverPage(props) {
     const args = {
       encrypted_cid: id,
       pub_key: pub_key,
-      contract_id: "tdtu_contract_ft.testnet"
+      contract_id: "harvardtp_ft.testnet"
     }
 
     const response = await callMethod(near, {contractId: contractID,
