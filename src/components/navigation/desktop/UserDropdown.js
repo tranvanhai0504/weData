@@ -118,15 +118,20 @@ export function UserDropdown(props) {
           </div>
         </button>
         <ul
-          className="dropdown-menu"
+          className="dropdown-menu text-center"
           aria-labelledby="dropdownMenu2222"
           style={{ minWidth: "fit-content" }}
         >
-          <li>
+          <li className="text-white d-flex flex-column align-items-center justify-content-center">
+            <img
+              style={{width: "2rem"}}
+              src="https://lserxeomcpenkpxcdnan.supabase.co/storage/v1/object/public/image/370629065_688872989293745_9035513986791993486_n.png"
+            />
+            <p>{(props.amount).toLocaleString('fullwide', {useGrouping:false})} HTPC</p>
           </li>
           <li>
             <button
-              className="dropdown-item"
+              className="dropdown-item d-flex justify-content-center"
               type="button"
               onClick={() => props.logOut()}
             >
