@@ -5,12 +5,13 @@ import { open, create } from "@nearfoundation/near-js-encryption-box";
 
 const contractID = process.env.REACT_APP_CONTRACT_ID
 const nonce = process.env.REACT_APP_NONCE
-
+const contractID_AILauncher = process.env.REACT_APP_CONTRACT_ID_AILAUNCHER
 
 export default function ListAcceptPage(props){
     const near = useNear()
     const account = useAccount();
     const [waitingList, setWaitingList] = useState([])
+    const [waitingRole, setWaitingRole] = useState([])
 
     useEffect(() => {
         if(!near) return
@@ -47,6 +48,16 @@ export default function ListAcceptPage(props){
         }))
     }, [near, props])
 
+    useEffect(() => {
+
+        if(!near || !account.accountId) return
+
+        viewMethod(near, {contractId: contractID_AILauncher, method: "get_request_by_owner", args: {account_id: account.accountId}}).then((result) => {
+            console.log("asdfasf", result)
+            setWaitingRole(result)
+        })
+    }, [near, props, account])
+
     const confirm = useCallback(async (buyerId, ECID, is_access, pub_key)=>{
 
         const key = JSON.parse(localStorage.getItem("keys")).filter(key => {
@@ -75,10 +86,22 @@ export default function ListAcceptPage(props){
 
     }, [near, props])
 
+    const excute = useCallback((prj_id, user_id, role, is_accept) => {
+        if(!near) return
+
+        const args = {
+            prj_id, user_id, role, is_accept
+        }
+
+        callMethod(near, {contractId: contractID_AILauncher, method: "excute_request", args}).then(() => {})
+    }, [near, props])
+
     const passingProps = {
         ...props,
         waitingList,
-        confirm
+        confirm,
+        waitingRole,
+        excute
     }
 
     return <Widget src="tvh050423.testnet/widget/ListAcceptPage" props={passingProps}/>

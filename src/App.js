@@ -13,6 +13,7 @@ import StoragePage from "./pages/DataStoragePage"
 import DiscoverPage from "./pages/DiscoverPage";
 import Marketplace from "./pages/MarketPlace"
 import ListAcceptPage from "./pages/ListAcceptPage";
+import AILauncherPage from "./pages/AILauncherPage";
 import { setupWalletSelector } from "@near-wallet-selector/core";
 import { setupNearWallet } from "@near-wallet-selector/near-wallet";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
@@ -31,6 +32,7 @@ import { NetworkId, Widgets } from "./data/widgets";
 import { utils } from 'near-api-js';
 import DetailPage from "./pages/DetailPage";
 import Root from "./pages/Root";
+import DetailLauncherPage from "./pages/DetailLauncherPage";
 
 function App(props) {
   const [connected, setConnected] = useState(false);
@@ -181,6 +183,10 @@ function App(props) {
           element: <DetailPage {...passProps} />,
         },
         {
+          path: "detailLauncherPage/*",
+          element: <DetailLauncherPage {...passProps} />,
+        },
+        {
           path: "marketplace",
           element: <Marketplace {...passProps} />,
         },
@@ -191,6 +197,10 @@ function App(props) {
         {
           path: "listAccept",
           element: <ListAcceptPage {...passProps}/>,
+        },
+        {
+          path: "aiLauncher",
+          element: <AILauncherPage {...passProps}/>,
         },
         {
           path: "",

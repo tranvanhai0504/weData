@@ -38,7 +38,7 @@ const ButtonGroup = styled.div`
 `;
 
 const HeaderButton = styled(Link)`
-    margin-right: 40px;
+    margin-right: 35px;
     cursor: pointer;
     text-decoration: none;
     color: white;
@@ -48,6 +48,20 @@ const HeaderButton = styled(Link)`
         text-decoration: none
     }
 `;
+
+const SpecialBtn = styled(Link)`
+    margin-right: 35px;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 0.6rem 0.5rem;
+    color: white;
+    background: rgba(72, 72, 72, 0.7);
+
+    :hover{
+        color: white;
+        text-decoration: none
+    }
+`
 
 const listBtn = [
   {
@@ -69,6 +83,11 @@ const listBtn = [
     name: "List Accept",
     numberID: 3,
     href: "/listAccept"
+  },
+  {
+    name: "AI Launcher",
+    numberID: 4,
+    href: "/aiLauncher"
   },
 ];
 
@@ -110,16 +129,24 @@ function Navigation(props) {
                 <img src={logo} alt="..."/>
             </Logo>
             <ButtonGroup className="d-flex flex-row align-items-center">
-                {listBtn.map((btn) => {
-                    return (
-                    <HeaderButton
-                        key={btn.numberID}
-                        to={btn.href}
-                        id={btn.numberID}
-                        className={location.pathname === btn.href && "text-decoration-underline"}
-                    >
-                        {btn.name}
-                    </HeaderButton>
+                {listBtn.map((btn, index) => {
+                    return index !== 4 ? (
+                        <HeaderButton
+                            key={btn.numberID}
+                            to={btn.href}
+                            id={btn.numberID}
+                            className={location.pathname === btn.href && "text-decoration-underline"}
+                        >
+                            {btn.name}
+                        </HeaderButton>
+                    ) : (
+                        <SpecialBtn className="rounded"
+                            key={btn.numberID}
+                            to={btn.href}
+                            id={btn.numberID}
+                        >
+                            {btn.name}
+                        </SpecialBtn>
                     );
                 })}
                 {!props.signedIn && (

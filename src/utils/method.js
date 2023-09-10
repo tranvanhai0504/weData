@@ -1,6 +1,5 @@
 import { providers } from "near-api-js";
 
-
 const THIRTY_TGAS = "30000000000000";
 const NO_DEPOSIT = "0";
 
@@ -15,6 +14,12 @@ export const viewMethod = async function(near, {
           "Wallet selector not initialized"
         );
     }
+
+    console.log("id",args)
+    if (!contractId) {
+      return
+    }
+
     const { config } = near;
     const provider = new providers.JsonRpcProvider({ url: config.nodeUrl });
 
